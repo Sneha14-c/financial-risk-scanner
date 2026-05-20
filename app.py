@@ -11,7 +11,7 @@ from pypdf import PdfReader
 MAX_CONTEXT_CHARS = 3000
 
 st.set_page_config(
-    page_title=" Financial Risk Scanner",
+    page_title=" Financial Risk Scanner demo changes",
     layout="wide"
 )
 
@@ -29,7 +29,7 @@ language = st.sidebar.selectbox(
 TEXT = {
 
     "English": {
-        "title": "📄  Financial Risk Scanner",
+        "title": "📄  Financial Risk Scanner demo changes",
         "profile": "Investor Profile",
         "age": "Investor Age",
         "income": "Annual Income (₹)",
