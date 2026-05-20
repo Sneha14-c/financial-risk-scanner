@@ -1,0 +1,23 @@
+ABC Technologies Pvt Ltd
+Financial Summary Report - 2025
+
+Revenue: ₹12,00,000
+Operating Expenses: ₹15,50,000
+Net Profit/Loss: -₹3,50,000
+
+Outstanding Loan Amount: ₹25,00,000
+Interest Due: ₹4,50,000
+
+Credit Card Liabilities: ₹3,20,000
+Pending Vendor Payments: ₹2,80,000
+
+Observations:
+- Company expenses exceed revenue.
+- Continuous losses recorded for last 3 quarters.
+- High debt-to-income ratio detected.
+- Risk of loan default is moderate to high.
+- Cash flow instability observed.
+
+Recommendation:
+Immediate financial restructuring recommended.
+Reduce operational expenses and clear outstanding liabilities.

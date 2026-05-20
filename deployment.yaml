@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: financial-risk-scanner
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: financial-risk-scanner
+
+  template:
+    metadata:
+      labels:
+        app: financial-risk-scanner
+
+    spec:
+      containers:
+      - name: financial-risk-scanner
+        image: financial-risk-scanner:latest
+        imagePullPolicy: Never
+
+        ports:
+        - containerPort: 8501

@@ -3,22 +3,23 @@
 # =========================
 import re
 import streamlit as st
-import ollama
 from pypdf import PdfReader
 
 # =========================
 # CONFIG
 # =========================
-CHAT_MODEL = "gemma:2b"
 MAX_CONTEXT_CHARS = 3000
 
-st.set_page_config(page_title="Financial Risk Scanner", layout="wide")
+st.set_page_config(
+    page_title="Container demo for financial risk scanner",
+    layout="wide"
+)
 
 # =========================
 # LANGUAGE SELECT
 # =========================
 language = st.sidebar.selectbox(
-    "Language / भाषा / ಭಾಷೆ",
+    "Language / भाषा / ಕನ್ನಡ",
     ["English", "Hindi", "Kannada"]
 )
 
@@ -26,12 +27,13 @@ language = st.sidebar.selectbox(
 # TEXT MAP
 # =========================
 TEXT = {
+
     "English": {
-        "title": "📄 Financial Document Risk Scanner",
+        "title": "📄 Container demo for financial risk scanner",
         "profile": "Investor Profile",
         "age": "Investor Age",
         "income": "Annual Income (₹)",
-        "upload": "Upload Policy Document (PDF or TXT)",
+        "upload": "Upload Financial Document (PDF or TXT)",
         "process": "🔍 Process Document",
         "summary": "📑 Generate Risk Summary",
         "clauses": "Extracted Risk Clauses",
@@ -43,12 +45,13 @@ TEXT = {
         "processing": "Processing document...",
         "generating": "Generating summary..."
     },
+
     "Hindi": {
         "title": "📄 वित्तीय दस्तावेज़ जोखिम विश्लेषक",
         "profile": "निवेशक प्रोफ़ाइल",
         "age": "निवेशक आयु",
         "income": "वार्षिक आय (₹)",
-        "upload": "पॉलिसी दस्तावेज़ अपलोड करें",
+        "upload": "वित्तीय दस्तावेज़ अपलोड करें",
         "process": "🔍 दस्तावेज़ विश्लेषण करें",
         "summary": "📑 जोखिम सारांश तैयार करें",
         "clauses": "निकाले गए जोखिम प्रावधान",
@@ -60,12 +63,13 @@ TEXT = {
         "processing": "दस्तावेज़ संसाधित किया जा रहा है...",
         "generating": "सारांश तैयार किया जा रहा है..."
     },
+
     "Kannada": {
         "title": "📄 ಹಣಕಾಸು ದಾಖಲೆ ಅಪಾಯ ವಿಶ್ಲೇಷಕ",
         "profile": "ಹೂಡಿಕೆದಾರರ ಪ್ರೊಫೈಲ್",
         "age": "ಹೂಡಿಕೆದಾರರ ವಯಸ್ಸು",
         "income": "ವಾರ್ಷಿಕ ಆದಾಯ (₹)",
-        "upload": "ಪಾಲಿಸಿ ದಾಖಲೆ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",
+        "upload": "ಹಣಕಾಸು ದಾಖಲೆ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",
         "process": "🔍 ದಾಖಲೆ ವಿಶ್ಲೇಷಿಸಿ",
         "summary": "📑 ಅಪಾಯ ಸಾರಾಂಶ ರಚಿಸಿ",
         "clauses": "ಪತ್ತೆಯಾದ ಅಪಾಯ ವಿಧಿಗಳು",
@@ -90,62 +94,121 @@ st.title(T["title"])
 # INVESTOR PROFILE
 # =========================
 st.sidebar.header(T["profile"])
-age = st.sidebar.number_input(T["age"], 18, 80, 30)
-annual_income = st.sidebar.number_input(T["income"], 100000, 2000000, 500000)
+
+age = st.sidebar.number_input(
+    T["age"],
+    18,
+    80,
+    30
+)
+
+annual_income = st.sidebar.number_input(
+    T["income"],
+    100000,
+    2000000,
+    500000
+)
 
 # =========================
 # FILE EXTRACTION
 # =========================
 def extract_text_from_file(uploaded_file):
+
     if uploaded_file.type == "text/plain":
+
         return uploaded_file.read().decode("utf-8")
+
     elif uploaded_file.type == "application/pdf":
+
         reader = PdfReader(uploaded_file)
+
         text = ""
+
         for page in reader.pages:
+
             content = page.extract_text()
+
             if content:
                 text += content + "\n"
+
         return text
+
     return ""
 
 # =========================
-# DOCUMENT RISK LOGIC
+# DOCUMENT PROCESSING
 # =========================
 def process_document(text):
 
     keywords = [
-        "year", "%", "return",
-        "commission", "charge",
-        "penalty", "increase",
+        "year",
+        "%",
+        "return",
+        "commission",
+        "charge",
+        "penalty",
+        "increase",
+        "loan",
+        "debt",
+        "loss",
+        "liability",
+        "interest",
+        "default",
         "reserves the right"
     ]
 
     lines = text.split("\n")
+
     relevant = []
 
     for line in lines:
+
         for word in keywords:
-            if word in line.lower():
+
+            if word.lower() in line.lower():
                 relevant.append(line)
                 break
 
     extracted_text = "\n".join(relevant)[:MAX_CONTEXT_CHARS]
 
+    # =========================
+    # RISK SCORE LOGIC
+    # =========================
     risk_score = 0
+
     text_lower = text.lower()
 
+    # Long-term commitment
     if re.search(r'(\d+)\s*year', text_lower):
-        risk_score += 20
+        risk_score += 15
 
+    # High percentages
     percentages = re.findall(r'(\d+)%', text_lower)
+
     for p in percentages:
+
         if int(p) > 50:
             risk_score += 20
             break
 
-    if re.search(r'increase.*?(\d+)%', text_lower):
-        risk_score += 20
+    # Financial keywords
+    if "loan" in text_lower:
+        risk_score += 15
+
+    if "debt" in text_lower:
+        risk_score += 15
+
+    if "loss" in text_lower:
+        risk_score += 15
+
+    if "liability" in text_lower:
+        risk_score += 10
+
+    if "default" in text_lower:
+        risk_score += 10
+
+    if "interest" in text_lower:
+        risk_score += 5
 
     if "reserves the right" in text_lower:
         risk_score += 10
@@ -153,149 +216,181 @@ def process_document(text):
     return extracted_text, risk_score
 
 # =========================
-# AGE & INCOME ADJUSTMENT
+# RISK ADJUSTMENT
 # =========================
 def adjust_risk(score):
 
-    age_adj = 5 if age < 25 else 5 if 41 <= age <= 55 else 10 if age > 55 else 0
-    income_adj = 10 if annual_income < 300000 else 5 if annual_income < 800000 else 0
+    # Age adjustment
+    if age < 25:
+        age_adj = 5
+
+    elif age > 55:
+        age_adj = 10
+
+    else:
+        age_adj = 0
+
+    # Income adjustment
+    if annual_income < 300000:
+        income_adj = 10
+
+    elif annual_income < 800000:
+        income_adj = 5
+
+    else:
+        income_adj = 0
 
     final_score = min(score + age_adj + income_adj, 100)
 
     if final_score >= 60:
-        base = "High"
+        base_level = "High"
+
     elif final_score >= 30:
-        base = "Medium"
-    else:
-        base = "Low"
+        base_level = "Medium"
 
+    else:
+        base_level = "Low"
+
+    # Translation
     if language == "Hindi":
-        map_level = {"High": "उच्च", "Medium": "मध्यम", "Low": "कम"}
+
+        mapping = {
+            "High": "उच्च",
+            "Medium": "मध्यम",
+            "Low": "कम"
+        }
+
     elif language == "Kannada":
-        map_level = {"High": "ಉನ್ನತ", "Medium": "ಮಧ್ಯಮ", "Low": "ಕಡಿಮೆ"}
+
+        mapping = {
+            "High": "ಉನ್ನತ",
+            "Medium": "ಮಧ್ಯಮ",
+            "Low": "ಕಡಿಮೆ"
+        }
+
     else:
-        map_level = {"High": "High", "Medium": "Medium", "Low": "Low"}
 
-    return final_score, map_level[base], base
+        mapping = {
+            "High": "High",
+            "Medium": "Medium",
+            "Low": "Low"
+        }
 
-# =========================
-# SUMMARY GENERATION
-# =========================
+    return final_score, mapping[base_level], base_level
+
 # =========================
 # SUMMARY GENERATION
 # =========================
 def generate_summary(extracted, score, level):
 
-    # Language-specific headings
     if language == "Hindi":
-        h1 = "## समग्र वित्तीय जोखिम"
-        h2 = "## कानूनी जोखिम"
-        h3 = "## दीर्घकालिक प्रभाव"
-        h4 = "## जोखिम वर्गीकरण"
-        h5 = "## निवेशक सिफारिशें"
-        lang_instruction = "पूरा उत्तर केवल हिंदी में लिखें। किसी भी प्रकार का अंग्रेज़ी शब्द उपयोग न करें।"
-        age_income_line = f"निवेशक की आयु {age} वर्ष है और वार्षिक आय ₹{annual_income} है। विश्लेषण में इन दोनों का प्रभाव स्पष्ट रूप से शामिल करें।"
 
-    elif language == "Kannada":
-        h1 = "## ಒಟ್ಟು ಹಣಕಾಸು ಅಪಾಯ"
-        h2 = "## ಕಾನೂನು ಅಪಾಯ"
-        h3 = "## ದೀರ್ಘಕಾಲಿಕ ಪರಿಣಾಮ"
-        h4 = "## ಅಪಾಯ ವರ್ಗೀಕರಣ"
-        h5 = "## ಹೂಡಿಕೆದಾರರ ಶಿಫಾರಸುಗಳು"
-        lang_instruction = "ಸಂಪೂರ್ಣ ಉತ್ತರವನ್ನು ಕನ್ನಡದಲ್ಲಿ ಮಾತ್ರ ಬರೆಯಿರಿ. ಯಾವುದೇ ಇಂಗ್ಲಿಷ್ ಪದಗಳನ್ನು ಬಳಸಬೇಡಿ."
-        age_income_line = f"ಹೂಡಿಕೆದಾರರ ವಯಸ್ಸು {age} ವರ್ಷ ಮತ್ತು ವಾರ್ಷಿಕ ಆದಾಯ ₹{annual_income} ಆಗಿದೆ. ಈ ಎರಡು ಅಂಶಗಳ ಪರಿಣಾಮವನ್ನು ವಿಶ್ಲೇಷಣೆಯಲ್ಲಿ ಸ್ಪಷ್ಟವಾಗಿ ಸೇರಿಸಿ."
+        summary = f"""
+## वित्तीय जोखिम विश्लेषण
 
-    else:
-        h1 = "## Overall Financial Exposure"
-        h2 = "## Legal Vulnerability"
-        h3 = "## Long-Term Risk Impact"
-        h4 = "## Risk Severity Classification"
-        h5 = "## Advisory Recommendation"
-        lang_instruction = "Write the entire response strictly in English."
-        age_income_line = f"The investor is {age} years old with an annual income of ₹{annual_income}. Clearly integrate how age and income influence risk exposure."
+### समग्र जोखिम
+दस्तावेज़ में कई वित्तीय जोखिम संकेत मिले हैं।
+निवेशक की आय और आयु के आधार पर जोखिम मध्यम से उच्च है।
 
-    # Step 1: Generate structured summary
-    base_prompt = f"""
-You MUST follow the structure EXACTLY.
-Do NOT change headings.
-Do NOT add extra sections.
+### जोखिम स्तर
+जोखिम स्कोर: {score}/100
+जोखिम स्तर: {level}
 
-{lang_instruction}
+### प्रमुख जोखिम
+- ऋण और देनदारियाँ मौजूद हैं
+- वित्तीय हानि का संकेत मिला
+- दीर्घकालिक भुगतान जोखिम
+- उच्च वित्तीय बोझ
 
-Output EXACTLY in this format:
+### सिफारिश
+निवेश से पहले दस्तावेज़ की पूरी समीक्षा करें।
+ऋण कम करें और सुरक्षित निवेश विकल्प चुनें।
 
-{h1}
-(5-7 sentences including age and income impact)
-
-{h2}
-(5-7 sentences)
-
-{h3}
-(5-7 sentences)
-
-{h4}
-(Explain clearly why overall risk is {level})
-
-{h5}
-(Provide practical investor actions)
-
----------------------------------
-
-Risk Score: {score}
-Risk Level: {level}
-{age_income_line}
-
-Extracted Clauses:
+### निकाले गए प्रावधान
 {extracted}
 """
 
-    response = ollama.chat(
-        model=CHAT_MODEL,
-        messages=[{"role": "user", "content": base_prompt}],
-        options={
-            "num_predict": 1000,
-            "temperature": 0.05
-        }
-    )
+    elif language == "Kannada":
 
-    summary_text = response["message"]["content"]
+        summary = f"""
+## ಹಣಕಾಸು ಅಪಾಯ ವಿಶ್ಲೇಷಣೆ
 
-    # Step 2: Enforce language strictly (second pass cleanup)
-    if language != "English":
-        enforce_prompt = f"""
-Rewrite the following text fully in {language}.
-Remove any English words completely.
-Keep meaning same.
-Do NOT change headings.
+### ಒಟ್ಟು ಅಪಾಯ
+ದಾಖಲೆಯಲ್ಲಿ ಹಲವು ಹಣಕಾಸು ಅಪಾಯ ಸೂಚನೆಗಳು ಕಂಡುಬಂದಿವೆ.
+ಹೂಡಿಕೆದಾರರ ಆದಾಯ ಮತ್ತು ವಯಸ್ಸಿನ ಆಧಾರದ ಮೇಲೆ ಅಪಾಯ ಮಧ್ಯಮದಿಂದ ಉನ್ನತ ಮಟ್ಟದಲ್ಲಿದೆ.
 
-Text:
-{summary_text}
+### ಅಪಾಯ ಮಟ್ಟ
+ಅಪಾಯ ಅಂಕ: {score}/100
+ಅಪಾಯ ಮಟ್ಟ: {level}
+
+### ಪ್ರಮುಖ ಅಪಾಯಗಳು
+- ಸಾಲ ಮತ್ತು ಬಾಧ്യതೆಗಳು ಕಂಡುಬಂದಿವೆ
+- ಹಣಕಾಸು ನಷ್ಟದ ಸೂಚನೆ
+- ದೀರ್ಘಕಾಲಿಕ ಪಾವತಿ ಅಪಾಯ
+- ಹೆಚ್ಚಿನ ಹಣಕಾಸು ಒತ್ತಡ
+
+### ಶಿಫಾರಸು
+ಹೂಡಿಕೆಗೆ ಮೊದಲು ದಾಖಲೆ ಸಂಪೂರ್ಣ ಪರಿಶೀಲಿಸಿ.
+ಸಾಲವನ್ನು ಕಡಿಮೆ ಮಾಡಿ ಮತ್ತು ಸುರಕ್ಷಿತ ಹೂಡಿಕೆ ಆಯ್ಕೆಮಾಡಿ.
+
+### ಪತ್ತೆಯಾದ ವಿಧಿಗಳು
+{extracted}
 """
-        response2 = ollama.chat(
-            model=CHAT_MODEL,
-            messages=[{"role": "user", "content": enforce_prompt}],
-            options={
-                "num_predict": 1000,
-                "temperature": 0.0
-            }
-        )
-        return response2["message"]["content"]
 
-    return summary_text
+    else:
+
+        summary = f"""
+## Financial Risk Analysis
+
+### Overall Financial Exposure
+The uploaded document contains multiple financial risk indicators.
+The investor profile and extracted clauses indicate moderate to high exposure.
+
+### Risk Severity
+Risk Score: {score}/100
+Risk Level: {level}
+
+### Key Risk Factors
+- Debt and liabilities detected
+- Financial losses identified
+- Long-term repayment risks observed
+- High operational financial burden
+
+### Recommendation
+It is recommended to reduce liabilities,
+improve cash flow management,
+and avoid high-risk investments.
+
+### Extracted Clauses
+{extracted}
+"""
+
+    return summary
+
 # =========================
 # FILE UPLOAD
 # =========================
-uploaded_file = st.file_uploader(T["upload"], type=["pdf", "txt"])
+uploaded_file = st.file_uploader(
+    T["upload"],
+    type=["pdf", "txt"]
+)
 
+# =========================
+# MAIN LOGIC
+# =========================
 if uploaded_file:
 
     document_text = extract_text_from_file(uploaded_file)
 
     col1, col2 = st.columns(2)
 
+    # PROCESS BUTTON
     if col1.button(T["process"]):
+
         with st.spinner(T["processing"]):
+
             extracted, base_score = process_document(document_text)
+
             final_score, level_translated, base_level = adjust_risk(base_score)
 
             st.session_state.extracted = extracted
@@ -303,9 +398,13 @@ if uploaded_file:
             st.session_state.level = level_translated
             st.session_state.base_level = base_level
 
+    # SUMMARY BUTTON
     if col2.button(T["summary"]):
+
         if "extracted" in st.session_state:
+
             with st.spinner(T["generating"]):
+
                 st.session_state.summary = generate_summary(
                     st.session_state.extracted,
                     st.session_state.score,
@@ -314,28 +413,51 @@ if uploaded_file:
 
     st.markdown("---")
 
-    # SHOW CLAUSES (Original – No Translation)
+    # SHOW EXTRACTED CLAUSES
     if "extracted" in st.session_state:
-        st.subheader(T["clauses"])
-        st.text_area("", st.session_state.extracted, height=200)
 
-    # SHOW RISK
+        st.subheader(T["clauses"])
+
+        st.text_area(
+            "",
+            st.session_state.extracted,
+            height=200
+        )
+
+    # SHOW RISK OVERVIEW
     if "score" in st.session_state:
+
         st.subheader(T["overview"])
 
         if st.session_state.base_level == "High":
-            st.error(f"{T['level']}: {st.session_state.level}")
+
+            st.error(
+                f"{T['level']}: {st.session_state.level}"
+            )
+
         elif st.session_state.base_level == "Medium":
-            st.warning(f"{T['level']}: {st.session_state.level}")
+
+            st.warning(
+                f"{T['level']}: {st.session_state.level}"
+            )
+
         else:
-            st.success(f"{T['level']}: {st.session_state.level}")
+
+            st.success(
+                f"{T['level']}: {st.session_state.level}"
+            )
 
         st.progress(st.session_state.score / 100)
-        st.markdown(f"**{T['score']}:** {st.session_state.score}/100")
+
+        st.markdown(
+            f"**{T['score']}:** {st.session_state.score}/100"
+        )
 
     # SHOW SUMMARY
     if "summary" in st.session_state:
+
         st.subheader(T["structured"])
+
         st.markdown(st.session_state.summary)
 
     st.caption(T["caption"])
