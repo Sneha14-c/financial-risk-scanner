@@ -11,7 +11,7 @@ from pypdf import PdfReader
 MAX_CONTEXT_CHARS = 3000
 
 st.set_page_config(
-    page_title=" Financial Risk Scanner demo changes",
+    page_title=" Financial Risk Scanner ",
     layout="wide"
 )
 
