@@ -1,4 +1,4 @@
 streamlit
-ollama
 pypdf
-chromadb
+pandas
+numpy
