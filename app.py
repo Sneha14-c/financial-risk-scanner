@@ -29,7 +29,7 @@ language = st.sidebar.selectbox(
 TEXT = {
 
     "English": {
-        "title": "📄  Financial Risk Scanner demo changes",
+        "title": "📄  Financial Risk Scanner ",
         "profile": "Investor Profile",
         "age": "Investor Age",
         "income": "Annual Income (₹)",
